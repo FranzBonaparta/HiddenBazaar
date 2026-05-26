@@ -108,7 +108,6 @@ end
 
 function CommandParser.textinput(text)
     local car = string.match(text, "%d")
-
     if CommandParser.toPrint.printInput and car then
         local input = Globals.selected
         if input == "inputId" then
@@ -116,7 +115,6 @@ function CommandParser.textinput(text)
             local resource = Resources.getResource(id)
             if not resource then return end
             Globals[input] = Globals[input] .. car
-
             Globals.placeholder = resource.name
             UI.setCanvas(CommandParser.toPrint)
         elseif input == "inputQuantity" then
@@ -124,15 +122,12 @@ function CommandParser.textinput(text)
             local msg = ""
             local canOperate = false
             local functionOrder = Globals.mode == "buy" and Markets.makeBuyOrder or Markets.makeSellOrder
-
             canOperate, msg = functionOrder(id, Player, tonumber(Globals.inputQuantity .. car))
             if canOperate then
                 Globals.inputQuantity = Globals.inputQuantity .. car
             else
                 Globals.msg = msg
             end
-
-
             UI.setCanvas(CommandParser.toPrint)
         end
     end

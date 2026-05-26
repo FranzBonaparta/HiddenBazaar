@@ -5,9 +5,9 @@ local Globals = require("globals")
 
 Markets.marketsList = {}
 Markets.keys = {}
+
 function Markets.initList()
   local resources = Resources.sort()
-
   --init markets
   for index, location in ipairs(Locations.list) do
     Markets.marketsList[index] = { id = index, name = location.name, articles = {} }
@@ -45,7 +45,7 @@ function Markets.getArticle(marketId, articleId)
     return market.articles[articleId]
   end
 end
-
+--check if the desired resource is available to be bought 
 function Markets.callBuy(id, player)
   local article = Globals.market.articles[id]
   local resource = Resources.getResource(id)
@@ -64,7 +64,7 @@ function Markets.callBuy(id, player)
   Globals.msg = msg
   return procede
 end
-
+--check if the player can sell the selected resource
 function Markets.callSell(playerStock)
   local resource = Resources.getResource(playerStock.id)
   local min = Globals.selected == "inputId" and 0 or tonumber(Globals.inputQuantity)
@@ -76,7 +76,7 @@ function Markets.callSell(playerStock)
     return false
   end
 end
-
+--function to get the articles's pool to print in the scrollBox
 function Markets.getArticlesRange(offset)
   offset = offset or Globals.marketOffset
 
@@ -90,7 +90,7 @@ function Markets.getArticlesRange(offset)
 
   return list
 end
-
+--check if the player can buy and afford the desired resource and estimate the price
 function Markets.makeBuyOrder(id, player, quantity)
   local bool, msg = false, ""
   local article = Globals.market.articles[id]
@@ -111,7 +111,7 @@ function Markets.makeBuyOrder(id, player, quantity)
   end
   return bool, msg
 end
-
+--check if the player can sell the desired resource and estimate the gain
 function Markets.makeSellOrder(id, player, quantity)
   local bool, msg = false, ""
   local price = 0
@@ -131,7 +131,7 @@ function Markets.makeSellOrder(id, player, quantity)
   return bool, msg
 end
 
---function to get articles pool to print in the scrollBox
+--function to change the offset from the articles pool
 function Markets.moveArticlesPool(change)
   local maxOffset = math.max(1, #Globals.market.articles - Globals.marketRange + 1)
 
