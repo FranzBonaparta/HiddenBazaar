@@ -15,6 +15,45 @@ CommandParser.toPrint = {
     printHelpMessage = true
 }
 
+function CommandParser.gotoLobby()
+    Globals.mode = "lobby"
+    Globals.inputId = ""
+    Globals.inputQuantity = ""
+end
+
+function CommandParser.gotoPreviousMenu(placeholder)
+    Globals.selected = "inputId"
+    Globals.inputQuantity = ""
+    Globals.placeholder = placeholder
+end
+
+function CommandParser.deleteChar()
+    local selected = tostring(Globals[Globals.selected])
+    if #selected > 0 then
+        Globals[Globals.selected] = string.sub(selected, 1,
+            #selected - 1)
+    end
+end
+
+function CommandParser.validateInput(player, markets)
+    if Globals.mode == "lobby" then return end
+    local id = tonumber(Globals.inputId)
+    if Globals.selected == "inputId" and #Globals.inputId > 0 then
+        local canProcede = Globals.mode == "buy" and markets.callBuy(id, player) or
+        markets.callSell(player.getArticle(id))
+        if canProcede then
+            Globals.selected = "inputQuantity"
+        end
+    elseif Globals.selected == "inputQuantity" and #Globals.inputQuantity > 0 then
+        local quantity = tonumber(Globals.inputQuantity)
+        quantity = Globals.mode == "buy" and quantity or quantity * (-1)
+        local canProcede = Globals.mode == "buy" and true or markets.callSell(player.getArticle(id))
+        if canProcede then
+            player.updateArticle(id, quantity)
+        end
+    end
+end
+
 function CommandParser.keypressed(key)
     if not key then return end
 
@@ -25,11 +64,11 @@ function CommandParser.keypressed(key)
                 if Globals.selected == "inputId" then
                     CommandParser.toPrint.printPrompt = false
                     CommandParser.toPrint.printInput = false
-                    Globals.gotoLobby()
+                    CommandParser.gotoLobby()
                 else
                     local resource = Resources.getResource(tonumber(Globals.inputId))
                     local placeholder = resource.name
-                    Globals.gotoPreviousMenu(placeholder)
+                    CommandParser.gotoPreviousMenu(placeholder)
                     Prompt.updatePrompt(Globals.mode)
                 end
             else
@@ -51,10 +90,10 @@ function CommandParser.keypressed(key)
         end,
         function() CommandParser.toPrint.printHelpMessage = not CommandParser.toPrint.printHelpMessage end,
         function()
-            Globals.deleteChar()
+            CommandParser.deleteChar()
         end,
         function()
-            Globals.validateInput(Player, Markets)
+            CommandParser.validateInput(Player, Markets)
             Prompt.updatePrompt(Globals.mode)
         end
     }
@@ -76,17 +115,16 @@ function CommandParser.textinput(text)
             local id = tonumber(Globals.inputId .. car)
             local resource = Resources.getResource(id)
             if not resource then return end
-                Globals[input] = Globals[input] .. car
+            Globals[input] = Globals[input] .. car
 
-                Globals.placeholder = resource.name
-                UI.setCanvas(CommandParser.toPrint)
-     
+            Globals.placeholder = resource.name
+            UI.setCanvas(CommandParser.toPrint)
         elseif input == "inputQuantity" then
             local id = tonumber(Globals.inputId)
             local msg = ""
             local canOperate = false
-            local functionOrder=Globals.mode=="buy" and Markets.makeBuyOrder or Markets.makeSellOrder
-            
+            local functionOrder = Globals.mode == "buy" and Markets.makeBuyOrder or Markets.makeSellOrder
+
             canOperate, msg = functionOrder(id, Player, tonumber(Globals.inputQuantity .. car))
             if canOperate then
                 Globals.inputQuantity = Globals.inputQuantity .. car

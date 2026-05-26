@@ -4,16 +4,15 @@ local Locations = require("locations")
 local Globals = require("globals")
 
 Markets.marketsList = {}
-Markets.keys={}
+Markets.keys = {}
 function Markets.initList()
   local resources = Resources.sort()
-  for _, resource in ipairs(resources) do
-    table.insert(Markets.keys,resource.id)
-  end
+
   --init markets
   for index, location in ipairs(Locations.list) do
     Markets.marketsList[index] = { id = index, name = location.name, articles = {} }
   end
+  local keysInitiated = false
   --add articles
   for key, market in pairs(Markets.marketsList) do
     local modifiers = Locations.list[key].marketModifiers
@@ -22,7 +21,12 @@ function Markets.initList()
       local price = math.floor(modifier * resource.basePrice)
       local quantity = math.random(0, math.floor(20 / (resource.rarity + 1)))
       market.articles[resource.id] = { id = resource.id, price = price, quantity = quantity }
+      --initialize keys array just once !
+      if not keysInitiated then
+        table.insert(Markets.keys, resource.id)
+      end
     end
+    keysInitiated = true
   end
 end
 
