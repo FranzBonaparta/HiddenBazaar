@@ -17,29 +17,33 @@ See [License : GNU GPLv3 or later](https://www.gnu.org/licenses/)
 ![CraftedInLua](https://img.shields.io/badge/Crafted_in-Lua-blue)
 ![NinjaDev](https://img.shields.io/badge/Ninja_Dev-🐢🍕-purple)
 
+![Miniature](./captures/miniature1.png)
+
+⚠️**The game is currently under development** it is not fully operational and many features are still missing!
+
 ## About
 
-HiddenBazaar is a small old-school trading game focused on occult and esoteric resources.
+**HiddenBazaar** is a small **old-school trading game** focused on **occult and esoteric resources**.
 
-Travel between isolated markets, buy strange artifacts, grimoires and ritual objects, then resell them where demand is higher.
+Travel between isolated markets, buy strange artifacts, grimoires and ritual objects, then resell them in places where demand is higher.
 
 The game is heavily inspired by:
 
-- old DOS / Apple II trading games,
-- terminal-like interfaces,
-- retro management games,
-- occult folklore and pseudo-esoteric artifacts.
+- old **DOS** / **Apple II** trading games,
+- **terminal-like interfaces**,
+- retro **management** games,
+- **occult folklore** and pseudo-esoteric artifacts.
 
-The project intentionally favors:
+The project intentionally focuses on:
 
-- lightweight UI,
-- keyboard-driven interaction,
-- data-oriented structures,
-- and minimalistic presentation.
+- **lightweight UI**,
+- **keyboard-driven** interaction,
+- **data-oriented** structures,
+- and **minimalistic presentation**.
 
 ---
 
-## Current Features
+## ⚙️ Current Features
 
 - Multiple markets with local price modifiers
 - Buy / sell system
@@ -52,7 +56,7 @@ The project intentionally favors:
 
 ---
 
-## Controls
+## 🕹️ Controls
 
 | Key | Action |
 |---|---|
@@ -67,26 +71,26 @@ The project intentionally favors:
 
 ---
 
-## Philosophy
+## 🕯️Philosophy
 
-HiddenBazaar is designed as a compact and experimental project.
+**HiddenBazaar** is designed as a compact and experimental project.
 
-The goal is not realism, but atmosphere:
+**The goal is not realism, but atmosphere**:
 markets filled with suspicious relics, strange grimoires and forgotten objects whose origins remain uncertain.
 
 Many resources are inspired by folklore, religious artifacts, occult symbolism and pseudo-historical curiosities.
 
 ---
 
-## Tech
+## 🛠 Tech
 
-- Language: Lua
-- Framework: Löve2D
-- Platform: Linux (primary development platform)
+- **Language: Lua**
+- **Framework: Löve2D**
+- **Platform: Linux** (primary development platform)
 
 ---
 
-## Planned Features
+## 🔭 Planned Features
 
 - Dynamic prices influenced by stock levels
 - Event system
@@ -97,8 +101,8 @@ Many resources are inspired by folklore, religious artifacts, occult symbolism a
 
 ---
 
-## Author
+## 🖋️ Author
 
-Created by Jojopov (Franz Bonaparta).
+Created by **Jojopov** (**Franz Bonaparta**).
 
 Open-source and designed as a lightweight experimental retro project.
