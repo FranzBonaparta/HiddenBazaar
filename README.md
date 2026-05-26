@@ -90,7 +90,7 @@ Many resources are inspired by folklore, religious artifacts, occult symbolism a
 
 ---
 
-## 🔭 Planned Features
+## 🔮 Planned Features
 
 - Dynamic prices influenced by stock levels
 - Event system
