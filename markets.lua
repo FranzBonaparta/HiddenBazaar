@@ -4,83 +4,71 @@ local Locations = require("locations")
 local Globals = require("globals")
 
 Markets.marketsList = {}
-
+Markets.keys={}
 function Markets.initList()
   local resources = Resources.sort()
+  for _, resource in ipairs(resources) do
+    table.insert(Markets.keys,resource.id)
+  end
   --init markets
   for index, location in ipairs(Locations.list) do
-    table.insert(Markets.marketsList, { id = index, name=location.name, articles = {} })
+    Markets.marketsList[index] = { id = index, name = location.name, articles = {} }
   end
   --add articles
-  for index, market in ipairs(Markets.marketsList) do
-    local modifiers = Locations.list[index].marketModifiers
+  for key, market in pairs(Markets.marketsList) do
+    local modifiers = Locations.list[key].marketModifiers
     for _, resource in ipairs(resources) do
       local modifier = modifiers[resource.type] or 1
       local price = math.floor(modifier * resource.basePrice)
       local quantity = math.random(0, math.floor(20 / (resource.rarity + 1)))
-      table.insert(market.articles, { id = resource.id, price = price, quantity = quantity })
+      market.articles[resource.id] = { id = resource.id, price = price, quantity = quantity }
     end
   end
 end
 
 function Markets.getMarket(id)
-  for _, market in ipairs(Markets.marketsList) do
-    if market.id == id then
-      return market
-    end
-  end
+  return Markets.marketsList[id]
 end
 
 function Markets.updateMarketArticle(marketId, articleId, quantity)
-  for _, market in ipairs(Markets.marketsList) do
-    if market.id == marketId then
-      for _, article in ipairs(market.articles) do
-        if article.id == articleId then
-          article.quantity = article.quantity + quantity
-          return
-        end
-      end
-    end
-  end
+  local q = Markets.marketsList[marketId].articles[articleId].quantity
+  Markets.marketsList[marketId].articles[articleId].quantity = q + quantity
 end
 
 function Markets.getArticle(marketId, articleId)
   local market = Markets.getMarket(marketId)
   if market then
-    for _, article in ipairs(market.articles) do
-      if article.id == articleId then
-        return article
-      end
-    end
+    return market.articles[articleId]
   end
 end
 
 function Markets.callBuy(id, player)
-  for _, article in ipairs(Globals.market.articles) do
-    local resource = Resources.getResource(article.id)
-    if not resource then return false end
-    local articleName = resource.name
-    if article.id == id and article.quantity <= 0 then
-      Globals.msg = "No stock available for " .. articleName
-      return false
-    elseif article.id == id and article.quantity > 0 then
-      if article.price > player.coins then
-        Globals.msg = "You can't buy any " .. articleName
-        return false
-      end
-      return true
+  local article = Globals.market.articles[id]
+  local resource = Resources.getResource(id)
+  if not resource then return false end
+  local articleName = resource.name
+  local msg, procede = "", false
+  if article.quantity <= 0 then
+    msg = "No stock available for " .. articleName
+  elseif article.quantity > 0 then
+    if article.price > player.coins then
+      msg = "You can't buy any " .. articleName
+    else
+      procede = true
     end
   end
+  Globals.msg = msg
+  return procede
 end
 
 function Markets.callSell(playerStock)
-  local resource=Resources.getResource(playerStock.id)
-  local min=Globals.selected=="inputId" and 0 or tonumber(Globals.inputQuantity)
-  if  playerStock.quantity >= min then
+  local resource = Resources.getResource(playerStock.id)
+  local min = Globals.selected == "inputId" and 0 or tonumber(Globals.inputQuantity)
+  if playerStock.quantity >= min then
     Globals.msg = ""
     return true
   else
-    Globals.msg = resource.name.." is no more present in your stock!"
+    Globals.msg = resource.name .. " is no more present in your stock!"
     return false
   end
 end
@@ -92,8 +80,8 @@ function Markets.getArticlesRange(offset)
   local list = {}
 
   for i = offset, offset + Globals.marketRange - 1 do
-    if not articles[i] then break end
-    table.insert(list, articles[i])
+    if not articles[Markets.keys[i]] then break end
+    table.insert(list, articles[Markets.keys[i]])
   end
 
   return list
@@ -101,23 +89,19 @@ end
 
 function Markets.makeBuyOrder(id, player, quantity)
   local bool, msg = false, ""
-  for index, article in ipairs(Globals.market.articles) do
-    if article.id == id then
-      if article.quantity >= quantity then
-        if player.coins >= quantity * article.price then
-          bool = true
-          Globals.estimatedPrice = -(quantity * article.price)
-        else
-          msg = "Not enought coins in your wallet"
-        end
-        break
-      else
-        local articleName = Resources.getResource(tonumber(Globals.inputId)).name
-        msg = "Not enought " .. articleName .. " in stock!"
-        break
-      end
+  local article = Globals.market.articles[id]
+  if article.quantity >= quantity then
+    if player.coins >= quantity * article.price then
+      bool = true
+      Globals.estimatedPrice = -(quantity * article.price)
+    else
+      msg = "Not enought coins in your wallet"
     end
+  else
+    local articleName = Resources.getResource(tonumber(Globals.inputId)).name
+    msg = "Not enought " .. articleName .. " in stock!"
   end
+
   if not bool then
     Globals.estimatedPrice = 0
   end
@@ -128,23 +112,17 @@ function Markets.makeSellOrder(id, player, quantity)
   local bool, msg = false, ""
   local price = 0
   --search the article actual price
-  for _, article in ipairs(Globals.market.articles) do
-    if article.id == id then
-      price = article.price
-      break
-    end
-  end
+  local article = Globals.market.articles[id]
+  price = article.price
+
   --then simulate operation
-  for _, article in ipairs(player.inventory) do
-    if article.id == id then
-      if article.quantity >= quantity then
-        bool = true
-        Globals.estimatedPrice = quantity * price
-      else
-        local articleName = Resources.getResource(tonumber(Globals.inputId)).name
-        msg = "Not enought " .. articleName .. " in your stock!"
-      end
-    end
+  local playerArticle = player.getArticle(id)
+  if playerArticle.quantity >= quantity then
+    bool = true
+    Globals.estimatedPrice = quantity * price
+  else
+    local articleName = Resources.getResource(tonumber(Globals.inputId)).name
+    msg = "Not enought " .. articleName .. " in your stock!"
   end
   return bool, msg
 end

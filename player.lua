@@ -36,16 +36,12 @@ function Player.initInventory()
   for _, resource in ipairs(resources) do
     local didHave = math.random(2)
     local quantity = (didHave > 1 and resource.rarity < 3) and math.random(math.floor(20 / (resource.rarity + 1))) or 0
-    table.insert(Player.inventory, { id = resource.id, quantity = quantity })
+    Player.inventory[resource.id]= { id = resource.id, quantity = quantity }
   end
 end
 
 function Player.getArticle(id)
-  for _, article in ipairs(Player.inventory) do
-    if article.id == id then
-      return article
-    end
-  end
+  return Player.inventory[id]
 end
 
 function Player.travel(destinationId)
@@ -64,11 +60,9 @@ end
 function Player.updateArticle(id, quantity)
   local marketOrder = Globals.mode == "buy" and Markets.callBuy(id, Player) or Markets.callSell(Player.getArticle(id))
     if not marketOrder then return end
-  for _, art in ipairs(Player.inventory) do
-    if art.id == id then
-      art.quantity = art.quantity + quantity
-    end
-  end
+    local article=Player.getArticle(id)
+    Player.inventory[id].quantity=article.quantity+quantity
+  
   local marketArticle = Markets.getArticle(Player.location, id)
   local price = marketArticle.price * quantity
   Player.coins = Player.coins - price
