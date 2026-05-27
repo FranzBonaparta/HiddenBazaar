@@ -29,6 +29,6 @@ Globals.orderMessage = ""
 Globals.estimatedPrice = 0
 Globals.help =
 "Type 'F1'..to 'F4' in order to travel. Type [B] to place a buying order, [S] to place a selling order. [ESC] to quit an order place and quit the game. [H] to hide or show this 'Help' message."
-
+Globals.details=""
 
 return Globals

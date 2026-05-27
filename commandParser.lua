@@ -12,7 +12,8 @@ CommandParser.toPrint = {
     printMarket = true,
     printPrompt = false,
     printInput = false,
-    printHelpMessage = true
+    printHelpMessage = true,
+    printDetails = false
 }
 
 function CommandParser.gotoLobby()
@@ -40,7 +41,7 @@ function CommandParser.validateInput(player, markets)
     local id = tonumber(Globals.inputId)
     if Globals.selected == "inputId" and #Globals.inputId > 0 then
         local canProcede = Globals.mode == "buy" and markets.callBuy(id, player) or
-        markets.callSell(player.getArticle(id))
+            markets.callSell(player.getArticle(id))
         if canProcede then
             Globals.selected = "inputQuantity"
         end
@@ -50,6 +51,7 @@ function CommandParser.validateInput(player, markets)
         local canProcede = Globals.mode == "buy" and true or markets.callSell(player.getArticle(id))
         if canProcede then
             player.updateArticle(id, quantity)
+            Globals.inputQuantity=""
         end
     end
 end
@@ -91,6 +93,7 @@ function CommandParser.keypressed(key)
         function() CommandParser.toPrint.printHelpMessage = not CommandParser.toPrint.printHelpMessage end,
         function()
             CommandParser.deleteChar()
+            CommandParser.getDetails()
         end,
         function()
             CommandParser.validateInput(Player, Markets)
@@ -116,6 +119,7 @@ function CommandParser.textinput(text)
             if not resource then return end
             Globals[input] = Globals[input] .. car
             Globals.placeholder = resource.name
+            CommandParser.getDetails()
             UI.setCanvas(CommandParser.toPrint)
         elseif input == "inputQuantity" then
             local id = tonumber(Globals.inputId)
@@ -131,6 +135,12 @@ function CommandParser.textinput(text)
             UI.setCanvas(CommandParser.toPrint)
         end
     end
+end
+
+function CommandParser.getDetails()
+    local resource = Resources.getResource(tonumber(Globals.inputId))
+    Prompt.printArticleDetails(resource)
+    CommandParser.toPrint.printDetails = #Globals.details > 0 and true or false
 end
 
 function CommandParser.setMarketCounter(mode)

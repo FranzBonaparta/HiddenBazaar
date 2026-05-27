@@ -36,7 +36,8 @@ function love.draw()
     love.graphics.draw(UI.canvas, 0, 0)
     if timer > 0 and #Globals.msg > 0 then
         love.graphics.setColor(1, 0, 0)
-        love.graphics.print(Globals.msg, 60, UI.height-60)
+        local height=Globals.font:getHeight("A")
+        love.graphics.print(Globals.msg, 100, UI.height-100-(3*height))
         love.graphics.setColor(1,1,1)
     end
 end

@@ -155,6 +155,12 @@ function UI.printPrompt()
   love.graphics.print(Globals.prompt, 100, UI.height - 200 + height)
 end
 
+function UI.printDetails()
+  love.graphics.setColor(Globals.fontColor)
+  local height = Globals.font:getHeight("A")
+  love.graphics.printf(Globals.details, 100, UI.height - 100 + (height * 3), UI.width - 200)
+end
+
 function UI.printInput()
   love.graphics.setColor(Globals.fontColor)
   love.graphics.line(0, UI.height - 100, UI.width, UI.height - 100)
@@ -168,7 +174,7 @@ function UI.printInput()
   end
   local id = tonumber(Globals.inputId)
   if id and id > 0 then
-    local article =Globals.mode=="buy" and Markets.getArticle(Player.location, id) or Player.getArticle(id)
+    local article = Globals.mode == "buy" and Markets.getArticle(Player.location, id) or Player.getArticle(id)
     local resource = Resources.getResource(id)
     if not article then return end
     local availableQuantity = article.quantity

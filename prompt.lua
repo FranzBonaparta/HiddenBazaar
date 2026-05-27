@@ -13,4 +13,14 @@ function Prompt.updatePrompt(mode)
   end
 end
 
+function Prompt.printArticleDetails(article)
+  if not article then
+    Globals.details = ""
+  else
+    if Globals.selected == "inputId" or Globals.selected == "inputQuantity" then
+      Globals.details = article.description
+    end
+  end
+end
+
 return Prompt
