@@ -31,4 +31,12 @@ Globals.help =
 "Type 'F1'..to 'F4' in order to travel. Type [B] to place a buying order, [S] to place a selling order. [ESC] to quit an order place and quit the game. [H] to hide or show this 'Help' message."
 Globals.details=""
 
+function Globals.round(x)
+  local newX,rest=math.modf(x)
+  local sign=newX>=0 and 1 or -1
+  local newRest=math.abs(rest)
+  newX=newRest>=0.5 and newX+(1*sign) or newX
+  return newX
+end
+
 return Globals

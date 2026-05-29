@@ -34,9 +34,12 @@ function Markets.getMarket(id)
   return Markets.marketsList[id]
 end
 
-function Markets.updateMarketArticle(marketId, articleId, quantity)
-  local q = Markets.marketsList[marketId].articles[articleId].quantity
-  Markets.marketsList[marketId].articles[articleId].quantity = q + quantity
+function Markets.updateMarketArticle(marketId, articleId, quantity,price)
+  local a = Markets.marketsList[marketId].articles[articleId]
+  a.quantity=a.quantity+quantity
+  price=price or a.price
+  a.price=price
+  Markets.marketsList[marketId].articles[articleId] = a
 end
 
 function Markets.getArticle(marketId, articleId)
@@ -55,7 +58,7 @@ function Markets.callBuy(id, player)
   if article.quantity <= 0 then
     msg = "No stock available for " .. articleName
   elseif article.quantity > 0 then
-    if article.price > player.coins then
+    if Globals.round(article.price) > player.coins then
       msg = "You can't buy any " .. articleName
     else
       procede = true
@@ -95,7 +98,7 @@ function Markets.makeBuyOrder(id, player, quantity)
   local bool, msg = false, ""
   local article = Globals.market.articles[id]
   if article.quantity >= quantity then
-    if player.coins >= quantity * article.price then
+    if player.coins >= Globals.round(quantity * article.price) then
       bool = true
       Globals.estimatedPrice = -(quantity * article.price)
     else
@@ -141,6 +144,18 @@ function Markets.moveArticlesPool(change)
   )
 
   Globals.articles = Markets.getArticlesRange()
+end
+function Markets.setNewPrice(player,id,quantity)
+  local article=Markets.getArticle(player.location,id)
+  local lastPrice=article.price
+  --price/ratio=aug
+  local ratio=quantity/100
+  local aug=ratio*lastPrice
+  local newPrice=lastPrice+aug
+  local resource=Resources.getResource(id)
+  newPrice=math.max(1,newPrice)
+  newPrice=math.min(newPrice,resource.basePrice*3)
+  Markets.updateMarketArticle(player.location,id,0,newPrice)
 end
 
 return Markets

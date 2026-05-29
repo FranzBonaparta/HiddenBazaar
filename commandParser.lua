@@ -51,6 +51,7 @@ function CommandParser.validateInput(player, markets)
         local canProcede = Globals.mode == "buy" and true or markets.callSell(player.getArticle(id))
         if canProcede then
             player.updateArticle(id, quantity)
+            Markets.setNewPrice(player,id,quantity)
             Globals.inputQuantity=""
         end
     end

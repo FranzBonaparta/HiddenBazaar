@@ -32,7 +32,7 @@ function UI.printCoins()
   love.graphics.setColor(Globals.colors.yellow)
   love.graphics.circle("fill", 20, 20, 10)
   love.graphics.setColor(Globals.fontColor)
-  love.graphics.print(Player.coins, 40, offsetY)
+  love.graphics.print(tostring(Player.coins).." Coins", 40, offsetY)
 end
 
 function UI.printLocation()
@@ -70,7 +70,7 @@ function UI.printMarket()
     table.insert(ys, offsetY)
     local playerItem = Player.getArticle(article.id)
     local articleDatas = Resources.getResource(article.id)
-    local datas = { articleDatas.name, article.quantity, playerItem.quantity, article.price }
+    local datas = { articleDatas.name, article.quantity, playerItem.quantity, Globals.round(article.price) }
     for index, data in ipairs(datas) do
       local length = font:getWidth(tostring(data)) + 20
       xs[index] = length > xs[index] and length or xs[index]
@@ -99,7 +99,7 @@ function UI.printMarket()
     local text = "[" .. article.id .. "]"
     love.graphics.print(text, offsetX - font:getWidth(text), ys[a] + 10)
     love.graphics.setColor(color)
-    local datas = { articleDatas.name, article.quantity, playerItem.quantity, article.price }
+    local datas = { articleDatas.name, article.quantity, playerItem.quantity, Globals.round(article.price) }
     sigmaXs = offsetX + 10
     for index, data in ipairs(datas) do
       love.graphics.print(data, sigmaXs, ys[a] + 10)
@@ -180,7 +180,7 @@ function UI.printInput()
     local availableQuantity = article.quantity
     local endLabel = Globals.selected == "inputQuantity" and " (available: " .. availableQuantity .. " ) " or ""
     local price = (Globals.estimatedPrice ~= 0 and #Globals.inputQuantity > 0) and Globals.estimatedPrice or nil
-    local priceText = price and " " .. tostring(price) .. " coins" or ""
+    local priceText = price and " " .. tostring(Globals.round(price)) .. " coins" or ""
     Globals.placeholder = resource.name .. endLabel .. priceText
     if Globals.placeholder and #Globals.placeholder > 0 then
       love.graphics.print(Globals.placeholder, 100 + Globals.font:getWidth(text) + 20, UI.height - 100 + height)

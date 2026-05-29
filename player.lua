@@ -64,7 +64,7 @@ function Player.updateArticle(id, quantity)
     Player.inventory[id].quantity=article.quantity+quantity
   
   local marketArticle = Markets.getArticle(Player.location, id)
-  local price = marketArticle.price * quantity
+  local price = Globals.round(marketArticle.price * quantity)
   Player.coins = Player.coins - price
   Markets.updateMarketArticle(Player.location, id, -quantity)
 end
