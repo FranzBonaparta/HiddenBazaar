@@ -1,5 +1,6 @@
 local Events={}
 local Markets=require("markets")
+local Resources=require("resources")
 --[[
   {
     name="",
@@ -49,9 +50,14 @@ function Events.applyEvent(eventId,market)
   for index,target in ipairs(event.targets) do
     local article=Markets.getArticle(market.id,target)
     if not target or not article then return end
-    local price=article.price*event.pricesEvolutions[index]
-    local quantity=article.quantity*event.stocksEvolutions[index]
+    local name=Resources.getResource(article.id).name
+    --print(name,article.price)
+    local price=event.pricesEvolutions[index]*article.price
+    local lastPrice=article.price
+    local quantity=event.stocksEvolutions[index]
+    quantity=quantity<1 and -quantity*article.quantity or article.quantity*quantity
     Markets.updateMarketArticle(market.id,target,quantity,price)    
+  --print(name,lastPrice,event.pricesEvolutions[index],price)
   end
 end
 return Events
