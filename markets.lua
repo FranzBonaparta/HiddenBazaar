@@ -36,7 +36,7 @@ end
 
 function Markets.updateMarketArticle(marketId, articleId, quantity,price)
   local a = Markets.marketsList[marketId].articles[articleId]
-  a.quantity=a.quantity+quantity
+  a.quantity=math.floor(a.quantity+quantity)
   price=price or a.price
   a.price=price
   Markets.marketsList[marketId].articles[articleId] = a

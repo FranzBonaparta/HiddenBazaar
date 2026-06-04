@@ -5,6 +5,7 @@ local Globals = require("globals")
 local Markets = require("markets")
 local Resources = require("resources")
 local Prompt = require("prompt")
+local EventsManager=require("eventsManager")
 CommandParser.toPrint = {
     printCoins = true,
     printLocation = true,
@@ -60,7 +61,7 @@ end
 function CommandParser.keypressed(key)
     if not key then return end
 
-    local keys = { "escape", "f1", "f2", "f3", "f4", "b", "s", "h", "backspace", "return" }
+    local keys = { "escape", "f1", "f2", "f3", "f4", "b", "s", "h", "backspace", "return","end" }
     local actions = {
         function()
             if Globals.mode ~= "lobby" then
@@ -99,6 +100,10 @@ function CommandParser.keypressed(key)
         function()
             CommandParser.validateInput(Player, Markets)
             Prompt.updatePrompt(Globals.mode)
+        end,
+        function ()
+            Player.daysRemaining=Player.daysRemaining-1
+            EventsManager.randomizeEvents()
         end
     }
     for index, k in ipairs(keys) do

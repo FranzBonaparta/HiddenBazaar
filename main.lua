@@ -4,6 +4,7 @@ local UI = require("ui")
 local Globals = require("globals")
 local timer = 0
 local CommandParser = require("commandParser")
+local EventsManager=require("eventsManager")
 -- Function called only once at the beginning
 function love.load()
     -- Initialization of resources (images, sounds, variables)
@@ -11,6 +12,7 @@ function love.load()
     UI.init()
     Markets.initList()
     Player.initInventory()
+    EventsManager.init()
     Globals.market = Markets.getMarket(Player.location)
     Globals.marketOffset = 1
     Globals.articles = Markets.getArticlesRange()
