@@ -4,7 +4,7 @@ local Globals = require("globals")
 local Locations = require("locations")
 local Markets = require("markets")
 local Resources = require("resources")
-local Events=require("events")
+local Events = require("events")
 UI.canvas = nil
 UI.width, UI.height = 0, 0
 UI.fontH = 0
@@ -34,7 +34,7 @@ function UI.printCoins()
   love.graphics.setColor(Globals.colors.yellow)
   love.graphics.circle("fill", 20, 20, 10)
   love.graphics.setColor(Globals.fontColor)
-  love.graphics.print(tostring(Player.coins).." Coins", 40, offsetY)
+  love.graphics.print(tostring(Player.coins) .. " Coins", 40, offsetY)
 end
 
 function UI.printLocation()
@@ -72,7 +72,7 @@ function UI.printMarket()
     table.insert(ys, offsetY)
     local playerItem = Player.getArticle(article.id)
     local articleDatas = Resources.getResource(article.id)
-    local price=Events.getModifiedPrice(Player.location,article.id)
+    local price = Events.getModifiedPrice(Player.location, article.id)
     local datas = { articleDatas.name, article.quantity, playerItem.quantity, Globals.round(price) }
     for index, data in ipairs(datas) do
       local length = font:getWidth(tostring(data)) + 20
@@ -102,7 +102,7 @@ function UI.printMarket()
     local text = "[" .. article.id .. "]"
     love.graphics.print(text, offsetX - font:getWidth(text), ys[a] + 10)
     love.graphics.setColor(color)
-        local price=Events.getModifiedPrice(Player.location,article.id)
+    local price = Events.getModifiedPrice(Player.location, article.id)
 
     local datas = { articleDatas.name, article.quantity, playerItem.quantity, Globals.round(price) }
     sigmaXs = offsetX + 10
@@ -126,11 +126,11 @@ function UI.printMarket()
   local text = "[" .. tostring(min) .. "-" .. tostring(min + articlesAmount - 1) .. "]" .. "/" .. tostring(size)
   love.graphics.print(text, sigmaXs - xs[4], ys[#ys] + font:getHeight(text))
 end
+
 local function getWidth(text)
-    return UI.width - Globals.font:getWidth(text) - 20
-  end
+  return UI.width - Globals.font:getWidth(text) - 20
+end
 function UI.printForeignMarkets()
-  
   love.graphics.setColor(Globals.fontColor)
   local a = 1
   --make decoration
@@ -192,26 +192,33 @@ function UI.printInput()
     end
   end
 end
+
 function UI.printEvents()
-  local market=Markets.getMarket(Player.location)
- 
-    local width=getWidth("Events")
-    love.graphics.print("Events",width,200)
-    local a=1
-      love.graphics.line(width, 200 + (Globals.font:getHeight("A") * (a )) + 10, UI.width - 20,
-200 + (Globals.font:getHeight("A") * (a)) + 10)
- if #market.activeEvents>0 then
-  for eventId, value in pairs(market.activeEvents) do
-    a=a+1
-    local duration=value.remainingDays
-    local event=Events.getEvent(eventId) 
-    local text=string.format("%s (%i days)",event.name,duration)
-    width=getWidth(text)
-      love.graphics.print(text,width,200 + (Globals.font:getHeight("A") * (a )) + 10)
-     end
-  
+  local market = Markets.getMarket(Player.location)
+
+  local width = getWidth("Events")
+  love.graphics.print("Events", width, 200)
+  local a = 1
+  love.graphics.line(width, 200 + (Globals.font:getHeight("A") * (a)) + 10, UI.width - 20,
+    200 + (Globals.font:getHeight("A") * (a)) + 10)
+  local hasEvents = false
+
+  for _ in pairs(market.activeEvents) do
+    hasEvents = true
+    break
+  end
+  if hasEvents then
+    for eventId, value in pairs(market.activeEvents) do
+      a = a + 1
+      local duration = value.remainingDays
+      local event = Events.getEvent(eventId)
+      local text = string.format("%s (%i days)", event.name, duration)
+      width = getWidth(text)
+      love.graphics.print(text, width, 200 + (Globals.font:getHeight("A") * (a)) + 10)
+    end
   end
 end
+
 function UI.printHelpMessage()
   love.graphics.setColor(Globals.fontColor)
 

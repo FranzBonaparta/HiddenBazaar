@@ -68,4 +68,17 @@ function Events.getModifiedPrice(marketId,articleId)
   
   return math.max(1,modifiedPrice+price)
 end
+
+function Events.getModifiedStock(marketId,articleId)
+  --local quantity=Markets.getArticle(marketId,articleId).quantity
+  local market=Markets.getMarket(marketId)
+  for eventId, value in pairs(market.activeEvents) do
+    local event=Events.getEvent(eventId)
+    local target=event.targets[articleId]
+    if target then
+      --test add stockEvolution each turn
+      Markets.updateMarketArticle(marketId,articleId,target.stockEvolution)
+    end
+  end
+end
 return Events

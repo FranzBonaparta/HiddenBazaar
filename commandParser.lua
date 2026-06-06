@@ -61,7 +61,11 @@ end
 
 function CommandParser.keypressed(key)
     if not key then return end
-
+    local function endTurn()
+Markets.updateNaturalVariation()
+            EventsManager.randomizeEvents()
+            EventsManager.updateStocksModification()
+    end
     local keys = { "escape", "f1", "f2", "f3", "f4", "b", "s", "h", "backspace", "return","end" }
     local actions = {
         function()
@@ -81,10 +85,10 @@ function CommandParser.keypressed(key)
                 return
             end
         end,
-        function() Player.travel(1) end,
-        function() Player.travel(2) end,
-        function() Player.travel(3) end,
-        function() Player.travel(4) end,
+        function() Player.travel(1) endTurn() end,
+        function() Player.travel(2) endTurn() end,
+        function() Player.travel(3) endTurn() end,
+        function() Player.travel(4) endTurn() end,
         function()
             Globals.selected = "inputId"
             CommandParser.setMarketCounter("buy")
@@ -104,7 +108,7 @@ function CommandParser.keypressed(key)
         end,
         function ()
             Player.daysRemaining=Player.daysRemaining-1
-            EventsManager.randomizeEvents()
+            endTurn() 
         end
     }
     for index, k in ipairs(keys) do
