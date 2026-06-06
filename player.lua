@@ -57,15 +57,14 @@ function Player.travel(destinationId)
   end
 end
 
-function Player.updateArticle(id, quantity)
+function Player.updateArticle(id, quantity,Events)
   local marketOrder = Globals.mode == "buy" and Markets.callBuy(id, Player) or Markets.callSell(Player.getArticle(id))
     if not marketOrder then return end
     local article=Player.getArticle(id)
     Player.inventory[id].quantity=article.quantity+quantity
-  
-  local marketArticle = Markets.getArticle(Player.location, id)
-  local price = Globals.round(marketArticle.price * quantity)
-  Player.coins = Player.coins - price
+  local price=Events.getModifiedPrice(Player.location,id)
+  local tradePrice = Globals.round(price * quantity)
+  Player.coins = Player.coins - tradePrice
   Markets.updateMarketArticle(Player.location, id, -quantity)
 end
 

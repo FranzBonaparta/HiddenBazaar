@@ -10,7 +10,7 @@ function Markets.initList()
   local resources = Resources.sort()
   --init markets
   for index, location in ipairs(Locations.list) do
-    Markets.marketsList[index] = { id = index, name = location.name, articles = {} }
+    Markets.marketsList[index] = { id = index, name = location.name, articles = {}, activeEvents={} }
   end
   local keysInitiated = false
   --add articles
@@ -33,13 +33,17 @@ end
 function Markets.getMarket(id)
   return Markets.marketsList[id]
 end
-
+--update on sale/purchase
 function Markets.updateMarketArticle(marketId, articleId, quantity,price)
   local a = Markets.marketsList[marketId].articles[articleId]
-  a.quantity=math.floor(a.quantity+quantity)
-  price=price or a.price
-  a.price=price
+  a.quantity=math.max(0,math.floor(a.quantity+quantity))
+  a.price=price or a.price
+  a.price=math.max(1,a.price)
   Markets.marketsList[marketId].articles[articleId] = a
+end
+function Markets.addEvent(marketId,eventId,duration)
+  Markets.marketsList[marketId].activeEvents[eventId]=
+  { id=eventId, remainingDays=duration}
 end
 
 function Markets.getArticle(marketId, articleId)
@@ -94,13 +98,14 @@ function Markets.getArticlesRange(offset)
   return list
 end
 --check if the player can buy and afford the desired resource and estimate the price
-function Markets.makeBuyOrder(id, player, quantity)
+function Markets.makeBuyOrder(id, player, quantity, Events)
   local bool, msg = false, ""
   local article = Globals.market.articles[id]
   if article.quantity >= quantity then
-    if player.coins >= Globals.round(quantity * article.price) then
+    local price=Events.getModifiedPrice(player.location,id)
+    if player.coins >= Globals.round(quantity * price) then
       bool = true
-      Globals.estimatedPrice = -(quantity * article.price)
+      Globals.estimatedPrice = -(quantity * price)
     else
       msg = "Not enought coins in your wallet"
     end
@@ -115,12 +120,9 @@ function Markets.makeBuyOrder(id, player, quantity)
   return bool, msg
 end
 --check if the player can sell the desired resource and estimate the gain
-function Markets.makeSellOrder(id, player, quantity)
+function Markets.makeSellOrder(id, player, quantity, Events)
   local bool, msg = false, ""
-  local price = 0
-  --search the article actual price
-  local article = Globals.market.articles[id]
-  price = article.price
+  local price = Events.getModifiedPrice(player.location,id)
 
   --then simulate operation
   local playerArticle = player.getArticle(id)

@@ -5,25 +5,33 @@ local Resources=require("resources")
   {
     name="",
     description="",
-    targets={},
-    pricesEvolutions={},
-    stocksEvolutions={}
+    targets={
+    []={priceEvolution= , stockEvolution=}
+    },
   },
   ]]
 Events.list={
   {
     name="posessions",
     description="some locals are reporting cases of possession",
-    targets={2,3,4,5,9},
-    pricesEvolutions={1.25,1.25,1.25,1.25,1.25},
-    stocksEvolutions={0.5,0.5,0.5,0.5,0.5,0.5}
+    targets={
+      [2]={priceEvolution=0.25,stockEvolution=-2},
+      [3]={priceEvolution=0.25 ,stockEvolution=-2 },
+      [4]={priceEvolution=0.25 ,stockEvolution=-2 },
+      [5]={priceEvolution=0.25 ,stockEvolution=-2 },
+      [9]={priceEvolution=0.25 ,stockEvolution=-2 }
+    }
   },
   {
     name="Inquisition",
     description="The inquisitor was dispatched to the city",
-    targets={2,3,11,10,13},
-    pricesEvolutions={0.5,0.5,0.5,1.5,1.5},
-    stocksEvolutions={1.5,1.5,1.5,0.5,0.5}
+    targets={
+      [2]={priceEvolution=-0.5 ,stockEvolution=5 },
+      [3]={priceEvolution=-0.5 ,stockEvolution=5 },
+      [11]={priceEvolution=-0.5 ,stockEvolution=5 },
+      [10]={priceEvolution=0.5 ,stockEvolution=-5 },
+      [13]={priceEvolution=0.5 ,stockEvolution=-5 }
+    }
   },
 
 }
@@ -45,19 +53,19 @@ function Events.getRandomEvent()
   local rand=math.random(1,#Events.list)
   return rand
 end
-function Events.applyEvent(eventId,market)
-  local event=Events.getEvent(eventId)
-  for index,target in ipairs(event.targets) do
-    local article=Markets.getArticle(market.id,target)
-    if not target or not article then return end
-    local name=Resources.getResource(article.id).name
-    --print(name,article.price)
-    local price=event.pricesEvolutions[index]*article.price
-    local lastPrice=article.price
-    local quantity=event.stocksEvolutions[index]
-    quantity=quantity<1 and -quantity*article.quantity or article.quantity*quantity
-    Markets.updateMarketArticle(market.id,target,quantity,price)    
-  --print(name,lastPrice,event.pricesEvolutions[index],price)
+
+function Events.getModifiedPrice(marketId,articleId)
+  local price=math.floor(Markets.getArticle(marketId,articleId).price)
+  local modifiedPrice=0
+  local market=Markets.getMarket(marketId)
+  for eventId, activeEvent in pairs(market.activeEvents) do
+    local event=Events.getEvent(eventId)
+    local target=event.targets[articleId]
+    if target then
+      modifiedPrice=modifiedPrice+math.floor(price*target.priceEvolution)
+    end
   end
+  
+  return math.max(1,modifiedPrice+price)
 end
 return Events

@@ -6,6 +6,7 @@ local Markets = require("markets")
 local Resources = require("resources")
 local Prompt = require("prompt")
 local EventsManager=require("eventsManager")
+local Events=require("events")
 CommandParser.toPrint = {
     printCoins = true,
     printLocation = true,
@@ -51,7 +52,7 @@ function CommandParser.validateInput(player, markets)
         quantity = Globals.mode == "buy" and quantity or quantity * (-1)
         local canProcede = Globals.mode == "buy" and true or markets.callSell(player.getArticle(id))
         if canProcede then
-            player.updateArticle(id, quantity)
+            player.updateArticle(id, quantity,Events)
             Markets.setNewPrice(player,id,quantity)
             Globals.inputQuantity=""
         end
@@ -132,7 +133,7 @@ function CommandParser.textinput(text)
             local msg = ""
             local canOperate = false
             local functionOrder = Globals.mode == "buy" and Markets.makeBuyOrder or Markets.makeSellOrder
-            canOperate, msg = functionOrder(id, Player, tonumber(Globals.inputQuantity .. car))
+            canOperate, msg = functionOrder(id, Player, tonumber(Globals.inputQuantity .. car),Events)
             if canOperate then
                 Globals.inputQuantity = Globals.inputQuantity .. car
             else

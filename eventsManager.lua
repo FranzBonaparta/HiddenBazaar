@@ -8,10 +8,11 @@ end
 
 function EventManager.randomizeEvents()
   for key,market in pairs(Markets.marketsList) do
-    local rand = math.random()
-    if rand > 0.5 then
+    --we can adjust the rate
+    local rand = math.random(1,20)
+    if rand ==1 then
       local eventId = Events.getRandomEvent()
-      Events.applyEvent(eventId, market)
+      Markets.addEvent(market.id,eventId,5)
       local event=Events.getEvent(eventId)
       print(event.name.." occurs on "..market.name)
       Markets.marketsList[key]=market
