@@ -171,16 +171,37 @@ end
 function Markets.updateNaturalVariation()
   for marketId, market in pairs(Markets.marketsList) do
     for articleId, article in pairs(market.articles) do
-      if math.random(1, 4) == 1 then
-        local stockDelta = math.random(-1,1)
+        local normalStock,stockDelta = Markets.getNaturalStockDelta(articleId, article)
+        local amount = math.max(1, math.floor(normalStock * 0.1))
+
+        stockDelta = math.floor( stockDelta*amount)
         Markets.updateMarketArticle(marketId, articleId, stockDelta)
-      end
       if math.random(1, 4) == 4 then
         local priceDelta = math.random(-2, 2) / 100
         local newPrice = article.price * (1 + priceDelta)
         Markets.updateMarketArticle(marketId, articleId, 0, newPrice)
       end
     end
+  end
+end
+
+function Markets.getNaturalStockDelta(articleId, article)
+  local resource = Resources.getResource(articleId)
+
+  local normalStock = math.floor(20 / resource.rarity)
+  local stockRatio = article.quantity / normalStock
+
+  -- The rarer the object, the less often it moves.
+  if math.random(1, resource.rarity) > 2 then
+    return normalStock,0
+  end
+
+  if stockRatio < 1 then
+    return normalStock,1
+  elseif stockRatio > 1.5 then
+    return normalStock,-1
+  else
+    return normalStock,math.random(-1, 1)
   end
 end
 
