@@ -167,15 +167,15 @@ function Markets.setNewPrice(player, id, quantity)
   newPrice = math.min(newPrice, resource.basePrice * 3)
   Markets.updateMarketArticle(player.location, id, 0, newPrice)
 end
-
+--to obtain a 'natural' variation in the items stock and price
 function Markets.updateNaturalVariation()
   for marketId, market in pairs(Markets.marketsList) do
     for articleId, article in pairs(market.articles) do
         local normalStock,stockDelta = Markets.getNaturalStockDelta(articleId, article)
         local amount = math.max(1, math.floor(normalStock * 0.1))
-
         stockDelta = math.floor( stockDelta*amount)
         Markets.updateMarketArticle(marketId, articleId, stockDelta)
+        --price evolution isn't automatic
       if math.random(1, 4) == 4 then
         local priceDelta = math.random(-2, 2) / 100
         local newPrice = article.price * (1 + priceDelta)
@@ -184,7 +184,7 @@ function Markets.updateNaturalVariation()
     end
   end
 end
-
+--to determine the trend of the operation (increase, decrease or stagnation)
 function Markets.getNaturalStockDelta(articleId, article)
   local resource = Resources.getResource(articleId)
 
