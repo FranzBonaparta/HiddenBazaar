@@ -20,7 +20,7 @@ function Markets.initList()
       local modifier = modifiers[resource.type] or 1
       local price = math.floor(modifier * resource.basePrice)
       local quantity = math.random(0, math.floor(20 / (resource.rarity + 1)))
-      market.articles[resource.id] = { id = resource.id, price = price, quantity = quantity }
+      market.articles[resource.id] = { id = resource.id, price = price, quantity = quantity, lastEvolutions = { 0 } }
       --initialize keys array just once !
       if not keysInitiated then
         table.insert(Markets.keys, resource.id)
@@ -38,6 +38,11 @@ end
 function Markets.updateMarketArticle(marketId, articleId, quantity, price)
   local a = Markets.marketsList[marketId].articles[articleId]
   a.quantity = math.max(0, math.floor(a.quantity + quantity))
+  if price then
+    local evolution = ((price - a.price) / a.price) * 100
+    Markets.updateEvolutions(marketId, articleId, evolution)
+  end
+
   a.price = price or a.price
   a.price = math.max(1, a.price)
   Markets.marketsList[marketId].articles[articleId] = a
@@ -158,7 +163,6 @@ end
 function Markets.setNewPrice(player, id, quantity)
   local article = Markets.getArticle(player.location, id)
   local lastPrice = article.price
-  --price/ratio=aug
   local ratio = quantity / 100
   local aug = ratio * lastPrice
   local newPrice = lastPrice + aug
@@ -167,23 +171,28 @@ function Markets.setNewPrice(player, id, quantity)
   newPrice = math.min(newPrice, resource.basePrice * 3)
   Markets.updateMarketArticle(player.location, id, 0, newPrice)
 end
+
 --to obtain a 'natural' variation in the items stock and price
 function Markets.updateNaturalVariation()
   for marketId, market in pairs(Markets.marketsList) do
     for articleId, article in pairs(market.articles) do
-        local normalStock,stockDelta = Markets.getNaturalStockDelta(articleId, article)
-        local amount = math.max(1, math.floor(normalStock * 0.1))
-        stockDelta = math.floor( stockDelta*amount)
-        Markets.updateMarketArticle(marketId, articleId, stockDelta)
-        --price evolution isn't automatic
-      if math.random(1, 4) == 4 then
-        local priceDelta = math.random(-2, 2) / 100
+      local normalStock, stockDelta = Markets.getNaturalStockDelta(articleId, article)
+      local amount = math.max(1, math.floor(normalStock * 0.1))
+      amount = math.floor(stockDelta * amount)
+      if article.quantity / normalStock >= 3 and stockDelta >= 0 then
+        amount = -math.floor(article.quantity * 0.1)
+      end
+      Markets.updateMarketArticle(marketId, articleId, amount)
+      --price evolution isn't automatic
+      if --[[math.random(1, 4) == 4 and ]] stockDelta ~= 0 and amount ~= 0 then
+        local priceDelta = (math.random(2) / 100) * -stockDelta
         local newPrice = article.price * (1 + priceDelta)
-        Markets.updateMarketArticle(marketId, articleId, 0, newPrice)
+        Markets.updateMarketArticle(marketId, articleId, 0, Globals.round(newPrice))
       end
     end
   end
 end
+
 --to determine the trend of the operation (increase, decrease or stagnation)
 function Markets.getNaturalStockDelta(articleId, article)
   local resource = Resources.getResource(articleId)
@@ -193,16 +202,35 @@ function Markets.getNaturalStockDelta(articleId, article)
 
   -- The rarer the object, the less often it moves.
   if math.random(1, resource.rarity) > 2 then
-    return normalStock,0
+    return normalStock, 0
   end
 
   if stockRatio < 1 then
-    return normalStock,1
+    return normalStock, 1
   elseif stockRatio > 1.5 then
-    return normalStock,-1
+    return normalStock, -1
   else
-    return normalStock,math.random(-1, 1)
+    return normalStock, math.random(-1, 1)
   end
+end
+
+function Markets.updateEvolutions(marketId, articleId, evolution)
+  local article = Markets.getArticle(marketId, articleId)
+  local lastEvolutions = article.lastEvolutions
+if #lastEvolutions >= 5 then
+  table.remove(lastEvolutions, 1)
+end
+  table.insert(lastEvolutions, evolution)
+  Markets.marketsList[marketId].articles[articleId].lastEvolutions = lastEvolutions
+end
+
+function Markets.getTotalEvolution(marketId, articleId)
+  local sum = 0
+  local article = Markets.getArticle(marketId, articleId)
+  for index, value in ipairs(article.lastEvolutions) do
+    sum = sum + value
+  end
+  return sum
 end
 
 return Markets

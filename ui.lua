@@ -59,7 +59,7 @@ function UI.printMarket()
   local offsetX = 100
   local offsetY = 50
   local font = Globals.font
-  local args = { "Name", "Quantity", "In stock", "Price" }
+  local args = { "Name", "Quantity", "In stock", "Price","5 days evol." }
   local xs = {}
   for _, arg in ipairs(args) do
     table.insert(xs, font:getWidth(arg) + 20)
@@ -73,7 +73,8 @@ function UI.printMarket()
     local playerItem = Player.getArticle(article.id)
     local articleDatas = Resources.getResource(article.id)
     local price = Events.getModifiedPrice(Player.location, article.id)
-    local datas = { articleDatas.name, article.quantity, playerItem.quantity, Globals.round(price) }
+    local evolution=string.format("%.2f",Markets.getTotalEvolution(Player.location,article.id)).."%"
+    local datas = { articleDatas.name, article.quantity, playerItem.quantity, Globals.round(price),evolution }
     for index, data in ipairs(datas) do
       local length = font:getWidth(tostring(data)) + 20
       xs[index] = length > xs[index] and length or xs[index]
@@ -103,8 +104,9 @@ function UI.printMarket()
     love.graphics.print(text, offsetX - font:getWidth(text), ys[a] + 10)
     love.graphics.setColor(color)
     local price = Events.getModifiedPrice(Player.location, article.id)
+        local evolution=string.format("%.2f",Markets.getTotalEvolution(Player.location,article.id)).."%"
 
-    local datas = { articleDatas.name, article.quantity, playerItem.quantity, Globals.round(price) }
+    local datas = { articleDatas.name, article.quantity, playerItem.quantity, Globals.round(price),evolution }
     sigmaXs = offsetX + 10
     for index, data in ipairs(datas) do
       love.graphics.print(data, sigmaXs, ys[a] + 10)

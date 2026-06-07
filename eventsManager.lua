@@ -14,7 +14,7 @@ function EventManager.randomizeEvents()
       local eventId = Events.getRandomEvent()
       Markets.addEvent(market.id, eventId, 5)
       local event = Events.getEvent(eventId)
-      print(event.name .. " occurs on " .. market.name)
+      --print(event.name .. " occurs on " .. market.name)
       Markets.marketsList[key] = market
     end
   end
