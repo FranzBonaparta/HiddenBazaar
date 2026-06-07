@@ -17,7 +17,7 @@ See [License : GNU GPLv3 or later](https://www.gnu.org/licenses/)
 ![CraftedInLua](https://img.shields.io/badge/Crafted_in-Lua-blue)
 ![NinjaDev](https://img.shields.io/badge/Ninja_Dev-🐢🍕-purple)
 
-![Miniature](./captures/miniature1.png)
+![Miniature](./captures/miniature2.png)
 
 ⚠️**The game is currently under development** it is not fully operational and many features are still missing!
 
@@ -53,6 +53,9 @@ The project intentionally focuses on:
 - Rare and cursed occult resources
 - Keyboard-only navigation
 - Dynamic stock quantities
+- Dynamic prices influenced by stock levels
+- Event system
+- List of articles prices evolution over 5 last days
 
 ---
 
@@ -92,8 +95,6 @@ Many resources are inspired by folklore, religious artifacts, occult symbolism a
 
 ## 🔮 Planned Features
 
-- Dynamic prices influenced by stock levels
-- Event system
 - Rumors and market information
 - Expanded resource pool
 - Additional locations
